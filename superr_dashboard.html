@@ -1,574 +1,790 @@
-<!DOCTYPE html>
-<html lang="en" class="dark">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rajasthan Royals | SupeRR Selector Season 2 - Executive Pressure Dashboard</title>
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        rr: {
-                            blue: '#1A365D',
-                            navy: '#0F172A',
-                            gold: '#D69E2E',
-                            lightgold: '#F6E05E',
-                            pink: '#ED64A6',
-                            cardbg: '#1E293B',
-                            darkbg: '#0B0F19'
-                        }
-                    },
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif']
-                    }
-                }
-            }
-        }
-    </script>
-    <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- FontAwesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<!doctype html>
+<!-- SupeRR Selector Season 2 | Round 1 | Pressure War Room
+     Single-file dashboard: HTML + CSS + JS. Needs internet only for Chart.js (CDN).
+     Keep SupeRR_Selector_S2_Round1_Methodology_Report.pdf next to this file for the download button. -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>SupeRR Selector S2 | Pressure War Room</title>
     <style>
-        body { font-family: 'Inter', sans-serif; }
-        .hero-gradient {
-            background: linear-gradient(135deg, #0F172A 0%, #1A365D 50%, #2A1B3D 100%);
+      :root {
+        --bg: #0f172a;
+        --bg2: #1a365d;
+        --pk: #ed64a6;
+        --au: #d69e2e;
+        --tx: #e8ecf8;
+        --mu: #93a0bd;
+        --gl: rgba(26, 54, 93, 0.45);
+        --ln: rgba(237, 100, 166, 0.22);
+        color-scheme: dark;
+        box-sizing: border-box;
+        padding-bottom: env(safe-area-inset-bottom, 0px);
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+      body {
+        margin: 0;
+        color: var(--tx);
+        font:
+          15px/1.55 system-ui,
+          -apple-system,
+          "Segoe UI",
+          sans-serif;
+        background: radial-gradient(900px 500px at 85% -5%, rgba(237, 100, 166, 0.18), transparent),
+          radial-gradient(800px 600px at 0 20%, rgba(26, 54, 93, 0.9), transparent), var(--bg);
+        min-height: 100vh;
+      }
+      nav {
+        position: sticky;
+        top: 0;
+        z-index: 9;
+        padding: calc(10px + env(safe-area-inset-top, 0px)) 16px 10px;
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+        background: rgba(15, 23, 42, 0.72);
+        border-bottom: 1px solid var(--ln);
+        display: flex;
+        gap: 6px;
+        align-items: center;
+        overflow-x: auto;
+      }
+      nav b {
+        background: linear-gradient(90deg, var(--pk), var(--au));
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        margin-right: 10px;
+        white-space: nowrap;
+      }
+      nav button {
+        background: none;
+        border: 1px solid transparent;
+        color: var(--mu);
+        padding: 7px 13px;
+        border-radius: 999px;
+        font: inherit;
+        font-size: 13px;
+        cursor: pointer;
+        white-space: nowrap;
+        transition: 0.25s;
+      }
+      nav button.on,
+      nav button:hover {
+        color: #fff;
+        border-color: var(--pk);
+        background: rgba(237, 100, 166, 0.16);
+        box-shadow: 0 0 18px rgba(237, 100, 166, 0.25);
+      }
+      main {
+        max-width: 1120px;
+        margin: 0 auto;
+        padding: 22px 16px 60px;
+      }
+      section {
+        display: none;
+        animation: in 0.45s;
+      }
+      section.on {
+        display: block;
+      }
+      @keyframes in {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
         }
-        .gold-glow {
-            box-shadow: 0 0 30px rgba(214, 158, 46, 0.25);
-        }
-        .card-hover {
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .card-hover:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 12px 30px -10px rgba(214, 158, 46, 0.35);
-        }
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: #0B0F19; }
-        ::-webkit-scrollbar-thumb { background: #1A365D; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #D69E2E; }
+      }
+      .hero {
+        padding: 44px 26px;
+        border-radius: 22px;
+        border: 1px solid var(--ln);
+        background: linear-gradient(
+          135deg,
+          rgba(237, 100, 166, 0.2),
+          rgba(26, 54, 93, 0.7) 55%,
+          rgba(15, 23, 42, 0.8)
+        );
+        position: relative;
+        overflow: hidden;
+      }
+      .pill {
+        display: inline-block;
+        font-size: 11px;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--au);
+        border: 1px solid rgba(214, 158, 46, 0.5);
+        padding: 4px 12px;
+        border-radius: 999px;
+      }
+      h1 {
+        font-size: clamp(28px, 6vw, 52px);
+        line-height: 1.08;
+        margin: 14px 0 10px;
+        background: linear-gradient(90deg, #fff, var(--pk) 55%, var(--au));
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        text-shadow: 0 0 40px rgba(237, 100, 166, 0.3);
+      }
+      .hero p {
+        color: var(--mu);
+        max-width: 640px;
+        margin: 0;
+      }
+      .grid {
+        display: grid;
+        gap: 14px;
+        margin-top: 18px;
+      }
+      .g4 {
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      }
+      .g2 {
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      }
+      .card {
+        background: var(--gl);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid var(--ln);
+        border-radius: 18px;
+        padding: 18px;
+        transition: 0.3s;
+      }
+      .card:hover {
+        border-color: var(--pk);
+        transform: translateY(-2px);
+      }
+      .num {
+        font-size: 34px;
+        font-weight: 800;
+        color: var(--au);
+        display: block;
+        text-shadow: 0 0 22px rgba(214, 158, 46, 0.35);
+      }
+      .lab {
+        color: var(--mu);
+        font-size: 12.5px;
+      }
+      h2 {
+        font-size: 22px;
+        margin: 26px 0 4px;
+      }
+      h3 {
+        margin: 0 0 6px;
+        font-size: 15px;
+        color: var(--pk);
+      }
+      .sub {
+        color: var(--mu);
+        margin: 0 0 12px;
+      }
+      canvas {
+        max-height: 280px;
+      }
+      .bar {
+        display: flex;
+        gap: 10px;
+        margin: 10px 0;
+      }
+      input {
+        flex: 1;
+        background: rgba(15, 23, 42, 0.7);
+        border: 1px solid var(--ln);
+        color: var(--tx);
+        border-radius: 12px;
+        padding: 10px 14px;
+        font: inherit;
+      }
+      input:focus {
+        outline: none;
+        border-color: var(--pk);
+      }
+      .t {
+        overflow-x: auto;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 720px;
+      }
+      th {
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.07em;
+        color: var(--mu);
+        text-align: left;
+        padding: 10px 8px;
+        border-bottom: 1px solid var(--ln);
+        cursor: pointer;
+        user-select: none;
+        white-space: nowrap;
+      }
+      th:hover {
+        color: var(--pk);
+      }
+      td {
+        padding: 11px 8px;
+        border-bottom: 1px solid rgba(147, 160, 189, 0.12);
+      }
+      tbody tr {
+        transition: 0.2s;
+      }
+      tbody tr:hover {
+        background: rgba(237, 100, 166, 0.09);
+      }
+      .rk {
+        font-weight: 800;
+        color: var(--au);
+      }
+      .nm {
+        font-weight: 700;
+      }
+      .gd {
+        color: #4ade80;
+        font-weight: 700;
+      }
+      .sc {
+        display: inline-block;
+        min-width: 54px;
+        text-align: center;
+        padding: 3px 10px;
+        border-radius: 999px;
+        background: linear-gradient(90deg, rgba(237, 100, 166, 0.35), rgba(214, 158, 46, 0.35));
+        font-weight: 700;
+      }
+      .step {
+        cursor: pointer;
+      }
+      .step.on {
+        border-color: var(--au);
+        box-shadow: 0 0 24px rgba(214, 158, 46, 0.2);
+      }
+      .step p {
+        display: none;
+        color: var(--mu);
+        margin: 6px 0 0;
+      }
+      .step.on p {
+        display: block;
+      }
+      code {
+        display: block;
+        background: rgba(15, 23, 42, 0.8);
+        border: 1px solid var(--ln);
+        border-radius: 12px;
+        padding: 12px;
+        color: var(--au);
+        font:
+          12.5px ui-monospace,
+          monospace;
+        overflow-x: auto;
+        margin-top: 8px;
+      }
+      .btn {
+        display: inline-block;
+        background: linear-gradient(90deg, var(--pk), #b83280);
+        color: #fff;
+        border: 0;
+        border-radius: 12px;
+        padding: 12px 20px;
+        font: inherit;
+        font-weight: 700;
+        cursor: pointer;
+        margin: 6px 8px 0 0;
+        text-decoration: none;
+        transition: 0.25s;
+      }
+      .btn:hover {
+        box-shadow: 0 0 26px rgba(237, 100, 166, 0.5);
+        transform: translateY(-1px);
+      }
+      .btn.o {
+        background: none;
+        border: 1px solid var(--au);
+        color: var(--au);
+      }
+      .note {
+        font-size: 12.5px;
+        color: var(--mu);
+      }
+      footer {
+        text-align: center;
+        color: var(--mu);
+        font-size: 12px;
+        padding: 30px;
+      }
     </style>
-</head>
-<body class="bg-rr-darkbg text-slate-100 min-h-screen flex flex-col selection:bg-rr-gold selection:text-rr-navy">
-
-    <!-- Toast Notification -->
-    <div id="toast" class="fixed bottom-5 right-5 z-50 transform translate-y-20 opacity-0 transition-all duration-300 bg-rr-gold text-rr-navy px-6 py-3 rounded-xl font-bold shadow-2xl flex items-center gap-3">
-        <i class="fa-solid fa-circle-check text-xl"></i>
-        <span id="toast-message">Action successful!</span>
-    </div>
-
-    <!-- HEADER / HERO SECTION -->
-    <header class="hero-gradient border-b border-slate-800 relative overflow-hidden">
-        <div class="absolute -top-40 -left-40 w-96 h-96 bg-rr-gold/10 rounded-full blur-3xl pointer-events-none"></div>
-        <div class="absolute -bottom-40 -right-40 w-96 h-96 bg-blue-600/10 rounded-full blur-3xl pointer-events-none"></div>
-
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 relative z-10">
-            <div class="flex flex-col md:flex-row justify-between items-center gap-8">
-                <!-- Branding & Title -->
-                <div class="text-center md:text-left">
-                    <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-rr-gold/10 border border-rr-gold/30 text-rr-gold font-semibold text-sm mb-4 gold-glow">
-                        <i class="fa-solid fa-crown text-rr-gold"></i> Rajasthan Royals • SupeRR Selector Season 2
-                    </div>
-                    <h1 class="text-3xl sm:text-5xl font-extrabold tracking-tight text-white mb-3">
-                        Clutch Performers <span class="text-transparent bg-clip-text bg-gradient-to-r from-rr-gold to-rr-lightgold">Under Pressure</span>
-                    </h1>
-                    <p class="text-slate-300 max-w-2xl text-sm sm:text-base leading-relaxed">
-                        Executive decision dashboard evaluating historical IPL & T20 International ball-by-ball datasets (2022+) to rank reliable match-winners.
-                    </p>
-                </div>
-
-                <!-- Action Buttons -->
-                <div class="flex flex-wrap gap-3 justify-center">
-                    <button onclick="downloadReport()" class="px-5 py-3 bg-gradient-to-r from-rr-gold to-yellow-500 text-rr-navy font-bold rounded-xl shadow-lg hover:brightness-115 transition-all flex items-center gap-2">
-                        <i class="fa-solid fa-file-pdf"></i> Download Report
-                    </button>
-                    <button onclick="copyShareableLink()" class="px-5 py-3 bg-slate-800/80 hover:bg-slate-700 text-white font-semibold rounded-xl border border-slate-700 backdrop-blur-md transition-all flex items-center gap-2">
-                        <i class="fa-solid fa-share-nodes text-rr-gold"></i> Share Link
-                    </button>
-                </div>
-            </div>
-
-            <!-- EXECUTIVE METRICS SUMMARY CARDS -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-10">
-                <div class="bg-rr-cardbg/80 border border-slate-700/60 rounded-2xl p-5 backdrop-blur-sm card-hover">
-                    <div class="flex justify-between items-start mb-3">
-                        <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Top Pressure Batter</span>
-                        <span class="p-2 rounded-lg bg-rr-gold/10 text-rr-gold"><i class="fa-solid fa-bolt"></i></span>
-                    </div>
-                    <div class="text-2xl font-bold text-white mb-1">Vaibhav Sooryavanshi</div>
-                    <div class="text-xs text-rr-gold font-medium">Pressure SR: 214.6 | Avg: 44.0</div>
-                </div>
-
-                <div class="bg-rr-cardbg/80 border border-slate-700/60 rounded-2xl p-5 backdrop-blur-sm card-hover">
-                    <div class="flex justify-between items-start mb-3">
-                        <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Top Pressure Bowler</span>
-                        <span class="p-2 rounded-lg bg-blue-500/10 text-blue-400"><i class="fa-solid fa-shield-halved"></i></span>
-                    </div>
-                    <div class="text-2xl font-bold text-white mb-1">Sufiyan Muqeem</div>
-                    <div class="text-xs text-blue-400 font-medium">Pressure Economy: 5.08 | Wkts: 33</div>
-                </div>
-
-                <div class="bg-rr-cardbg/80 border border-slate-700/60 rounded-2xl p-5 backdrop-blur-sm card-hover">
-                    <div class="flex justify-between items-start mb-3">
-                        <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Signals Analyzed</span>
-                        <span class="p-2 rounded-lg bg-emerald-500/10 text-emerald-400"><i class="fa-solid fa-database"></i></span>
-                    </div>
-                    <div class="text-2xl font-bold text-white mb-1">IPL & T20I (22+)</div>
-                    <div class="text-xs text-emerald-400 font-medium">Ball-by-Ball Match Context</div>
-                </div>
-
-                <div class="bg-rr-cardbg/80 border border-slate-700/60 rounded-2xl p-5 backdrop-blur-sm card-hover">
-                    <div class="flex justify-between items-start mb-3">
-                        <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Rating Model</span>
-                        <span class="p-2 rounded-lg bg-purple-500/10 text-purple-400"><i class="fa-solid fa-calculator"></i></span>
-                    </div>
-                    <div class="text-2xl font-bold text-white mb-1">Multi-Pillar</div>
-                    <div class="text-xs text-purple-400 font-medium">RRR, Death Overs, Collapses</div>
-                </div>
-            </div>
-        </div>
-    </header>
-
-    <!-- MAIN NAVIGATION TABS -->
-    <nav class="bg-slate-900 border-b border-slate-800 sticky top-0 z-40 backdrop-blur-md bg-opacity-90">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex space-x-2 sm:space-x-8 overflow-x-auto py-3 no-scrollbar">
-                <button onclick="switchMainTab('overview')" id="nav-overview" class="px-4 py-2 rounded-xl text-sm font-bold transition-all bg-rr-gold text-rr-navy shadow-md whitespace-nowrap flex items-center gap-2">
-                    <i class="fa-solid fa-gauge-high"></i> Overview & Methodology
-                </button>
-                <button onclick="switchMainTab('batters')" id="nav-batters" class="px-4 py-2 rounded-xl text-sm font-semibold transition-all text-slate-300 hover:text-white hover:bg-slate-800 whitespace-nowrap flex items-center gap-2">
-                    <i class="fa-solid fa-baseball-bat-ball"></i> Top 10 Batters
-                </button>
-                <button onclick="switchMainTab('bowlers')" id="nav-bowlers" class="px-4 py-2 rounded-xl text-sm font-semibold transition-all text-slate-300 hover:text-white hover:bg-slate-800 whitespace-nowrap flex items-center gap-2">
-                    <i class="fa-solid fa-bowling-ball"></i> Top 10 Bowlers
-                </button>
-                <button onclick="switchMainTab('analytics')" id="nav-analytics" class="px-4 py-2 rounded-xl text-sm font-semibold transition-all text-slate-300 hover:text-white hover:bg-slate-800 whitespace-nowrap flex items-center gap-2">
-                    <i class="fa-solid fa-chart-line"></i> Advanced Pressure Analytics
-                </button>
-            </div>
-        </div>
+  </head>
+  <body>
+    <nav id="nv">
+      <b>SupeRR · Pressure War Room</b><button data-s="ov" class="on">Overview</button
+      ><button data-s="bt">Batters</button><button data-s="bw">Bowlers</button
+      ><button data-s="me">Methodology</button><button data-s="ex">Export &amp; Submit</button>
     </nav>
-
-    <!-- CONTAINER BODY -->
-    <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full space-y-10">
-
-        <!-- TAB 1: OVERVIEW & METHODOLOGY -->
-        <div id="tab-content-overview" class="space-y-8">
-            <div class="bg-slate-900/90 border border-slate-800 rounded-3xl p-6 sm:p-10 shadow-xl">
-                <div class="max-w-3xl">
-                    <h2 class="text-2xl sm:text-3xl font-extrabold text-white mb-4">Engineering a Winning Pressure Evaluation Framework</h2>
-                    <p class="text-slate-300 leading-relaxed mb-6">
-                        In elite T20 cricket, standard averages and strike rates hide how players perform when the match is on the line. Our analytical architecture defines pressure dynamically across three core match-context signals:
-                    </p>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
-                    <div class="bg-slate-800/60 border border-slate-700 rounded-2xl p-6 card-hover">
-                        <div class="w-12 h-12 rounded-xl bg-rr-gold/10 text-rr-gold flex items-center justify-center font-bold text-xl mb-4">01</div>
-                        <h3 class="font-bold text-white text-lg mb-2">High Required Run Rate</h3>
-                        <p class="text-sm text-slate-300 leading-relaxed">
-                            In second-innings run chases when RRR exceeds <strong class="text-rr-gold">8.50 runs/over</strong>, placing immediate scoreboard pressure on batters.
-                        </p>
-                    </div>
-
-                    <div class="bg-slate-800/60 border border-slate-700 rounded-2xl p-6 card-hover">
-                        <div class="w-12 h-12 rounded-xl bg-blue-500/10 text-blue-400 flex items-center justify-center font-bold text-xl mb-4">02</div>
-                        <h3 class="font-bold text-white text-lg mb-2">Death Overs Phase</h3>
-                        <p class="text-sm text-slate-300 leading-relaxed">
-                            Deliveries in <strong class="text-blue-400">Overs 16 through 20</strong> across any innings, testing maximum boundary acceleration and containment.
-                        </p>
-                    </div>
-
-                    <div class="bg-slate-800/60 border border-slate-700 rounded-2xl p-6 card-hover">
-                        <div class="w-12 h-12 rounded-xl bg-purple-500/10 text-purple-400 flex items-center justify-center font-bold text-xl mb-4">03</div>
-                        <h3 class="font-bold text-white text-lg mb-2">Structural Collapses</h3>
-                        <p class="text-sm text-slate-300 leading-relaxed">
-                            Situations where <strong class="text-purple-400">4+ wickets have fallen</strong> within the first 15 overs, demanding rebuilding resilience.
-                        </p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Quick Spotlight Grid -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <div class="bg-slate-900/90 border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-xl flex flex-col justify-between">
-                    <div>
-                        <div class="flex items-center justify-between mb-4">
-                            <span class="px-3 py-1 bg-rr-gold/10 text-rr-gold rounded-full text-xs font-bold">Batter Spotlight</span>
-                            <span class="text-xs text-slate-400">Rank #1</span>
-                        </div>
-                        <h3 class="text-2xl font-bold text-white mb-2">Vaibhav Sooryavanshi</h3>
-                        <p class="text-sm text-slate-300 mb-6">Unrivaled striking capability under extreme pressure with a phenomenal pressure strike rate of 214.6 and an average of 44.0.</p>
-                        <div class="grid grid-cols-2 gap-4 bg-slate-800/50 p-4 rounded-2xl border border-slate-700">
-                            <div>
-                                <span class="text-xs text-slate-400">Pressure Strike Rate</span>
-                                <div class="text-lg font-mono font-bold text-rr-gold">214.6</div>
-                            </div>
-                            <div>
-                                <span class="text-xs text-slate-400">Pressure Average</span>
-                                <div class="text-lg font-mono font-bold text-white">44.0</div>
-                            </div>
-                        </div>
-                    </div>
-                    <button onclick="switchMainTab('batters')" class="mt-6 w-full py-3 bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold rounded-xl text-sm transition-all border border-slate-700">
-                        View Full Top 10 Batters List <i class="fa-solid fa-arrow-right ml-2"></i>
-                    </button>
-                </div>
-
-                <div class="bg-slate-900/90 border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-xl flex flex-col justify-between">
-                    <div>
-                        <div class="flex items-center justify-between mb-4">
-                            <span class="px-3 py-1 bg-blue-500/10 text-blue-400 rounded-full text-xs font-bold">Bowler Spotlight</span>
-                            <span class="text-xs text-slate-400">Rank #1</span>
-                        </div>
-                        <h3 class="text-2xl font-bold text-white mb-2">Sufiyan Muqeem</h3>
-                        <p class="text-sm text-slate-300 mb-6">Exceptional run containment and wicket-taking efficiency under pressure with a minuscule economy rate of 5.08.</p>
-                        <div class="grid grid-cols-2 gap-4 bg-slate-800/50 p-4 rounded-2xl border border-slate-700">
-                            <div>
-                                <span class="text-xs text-slate-400">Pressure Economy</span>
-                                <div class="text-lg font-mono font-bold text-blue-400">5.08</div>
-                            </div>
-                            <div>
-                                <span class="text-xs text-slate-400">Pressure Wickets</span>
-                                <div class="text-lg font-mono font-bold text-white">33 Wkts</div>
-                            </div>
-                        </div>
-                    </div>
-                    <button onclick="switchMainTab('bowlers')" class="mt-6 w-full py-3 bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold rounded-xl text-sm transition-all border border-slate-700">
-                        View Full Top 10 Bowlers List <i class="fa-solid fa-arrow-right ml-2"></i>
-                    </button>
-                </div>
-            </div>
+    <main>
+      <section id="ov" class="on">
+        <div class="hero">
+          <span class="pill">Rajasthan Royals · SupeRR Selector Season 2 · Round 1</span>
+          <h1>Who Delivers When It Matters?</h1>
+          <p>
+            A win-probability leverage model that finds the most reliable batters and bowlers under
+            real match pressure, across IPL and T20I cricket from 2022.
+          </p>
         </div>
-
-        <!-- TAB 2: TOP 10 BATTERS -->
-        <div id="tab-content-batters" class="space-y-6 hidden">
-            <div class="flex flex-col sm:flex-row justify-between items-center gap-4 bg-slate-900/90 p-4 rounded-2xl border border-slate-800">
-                <div>
-                    <h2 class="text-xl font-bold text-white">Top 10 Batters Under Pressure</h2>
-                    <p class="text-xs text-slate-400 mt-0.5">Ranked by weighted composite score (Strike Rate, Average & Clutch Differential)</p>
-                </div>
-                <div class="relative w-full sm:w-72">
-                    <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                        <i class="fa-solid fa-search"></i>
-                    </span>
-                    <input type="text" id="batter-search" oninput="filterBattersTable()" placeholder="Search batter..." class="w-full pl-10 pr-4 py-2 bg-slate-800 border border-slate-700 rounded-xl text-sm text-white placeholder-slate-400 focus:outline-none focus:border-rr-gold">
-                </div>
-            </div>
-
-            <!-- Batters Table -->
-            <div class="bg-slate-900/90 border border-slate-800 rounded-3xl overflow-hidden shadow-xl">
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse">
-                        <thead>
-                            <tr class="bg-slate-800/80 text-xs uppercase tracking-wider text-slate-400 border-b border-slate-700">
-                                <th class="py-4 px-6 font-semibold">Rank</th>
-                                <th class="py-4 px-6 font-semibold">Batter Name</th>
-                                <th class="py-4 px-6 font-semibold cursor-pointer hover:text-white" onclick="sortTable('batters', 'sr')">Pressure SR <i class="fa-solid fa-sort ml-1"></i></th>
-                                <th class="py-4 px-6 font-semibold cursor-pointer hover:text-white" onclick="sortTable('batters', 'avg')">Pressure Avg <i class="fa-solid fa-sort ml-1"></i></th>
-                                <th class="py-4 px-6 font-semibold cursor-pointer hover:text-white" onclick="sortTable('batters', 'score')">Pressure Score <i class="fa-solid fa-sort ml-1"></i></th>
-                                <th class="py-4 px-6 font-semibold text-center">Clutch Role</th>
-                            </tr>
-                        </thead>
-                        <tbody id="batters-table-tbody" class="divide-y divide-slate-800 text-sm">
-                            <!-- Injected via JS -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+        <div class="grid g4">
+          <div class="card">
+            <span class="num" data-n="883">0</span
+            ><span class="lab">matches in the dataset (867 with ball data, 818 modelled)</span>
+          </div>
+          <div class="card">
+            <span class="num" data-n="200999">0</span
+            ><span class="lab">deliveries analysed (194,939 in the model)</span>
+          </div>
+          <div class="card">
+            <span class="num" data-n="38769">0</span
+            ><span class="lab">high-pressure deliveries (top 20% leverage)</span>
+          </div>
+          <div class="card">
+            <span class="num" data-n="54">0</span
+            ><span class="lab">model settings behind the consensus rank</span>
+          </div>
         </div>
-
-        <!-- TAB 3: TOP 10 BOWLERS -->
-        <div id="tab-content-bowlers" class="space-y-6 hidden">
-            <div class="flex flex-col sm:flex-row justify-between items-center gap-4 bg-slate-900/90 p-4 rounded-2xl border border-slate-800">
-                <div>
-                    <h2 class="text-xl font-bold text-white">Top 10 Bowlers Under Pressure</h2>
-                    <p class="text-xs text-slate-400 mt-0.5">Ranked by economy rate, wicket-taking strike rate, and containment efficiency</p>
-                </div>
-                <div class="relative w-full sm:w-72">
-                    <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                        <i class="fa-solid fa-search"></i>
-                    </span>
-                    <input type="text" id="bowler-search" oninput="filterBowlersTable()" placeholder="Search bowler..." class="w-full pl-10 pr-4 py-2 bg-slate-800 border border-slate-700 rounded-xl text-sm text-white placeholder-slate-400 focus:outline-none focus:border-blue-500">
-                </div>
-            </div>
-
-            <!-- Bowlers Table -->
-            <div class="bg-slate-900/90 border border-slate-800 rounded-3xl overflow-hidden shadow-xl">
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse">
-                        <thead>
-                            <tr class="bg-slate-800/80 text-xs uppercase tracking-wider text-slate-400 border-b border-slate-700">
-                                <th class="py-4 px-6 font-semibold">Rank</th>
-                                <th class="py-4 px-6 font-semibold">Bowler Name</th>
-                                <th class="py-4 px-6 font-semibold cursor-pointer hover:text-white" onclick="sortTable('bowlers', 'econ')">Pressure Economy <i class="fa-solid fa-sort ml-1"></i></th>
-                                <th class="py-4 px-6 font-semibold cursor-pointer hover:text-white" onclick="sortTable('bowlers', 'wickets')">Pressure Wickets <i class="fa-solid fa-sort ml-1"></i></th>
-                                <th class="py-4 px-6 font-semibold cursor-pointer hover:text-white" onclick="sortTable('bowlers', 'score')">Pressure Score <i class="fa-solid fa-sort ml-1"></i></th>
-                                <th class="py-4 px-6 font-semibold text-center">Containment Role</th>
-                            </tr>
-                        </thead>
-                        <tbody id="bowlers-table-tbody" class="divide-y divide-slate-800 text-sm">
-                            <!-- Injected via JS -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+        <div class="grid g2">
+          <div class="card">
+            <h3>Batters: strike rate under pressure vs expected</h3>
+            <canvas id="c1"></canvas>
+          </div>
+          <div class="card">
+            <h3>Bowlers: economy under pressure vs expected</h3>
+            <canvas id="c2"></canvas>
+          </div>
+          <div class="card">
+            <h3>Pressure by over (leverage, win-prob. points per ball)</h3>
+            <canvas id="c3"></canvas>
+          </div>
+          <div class="card">
+            <h3>Consensus score, top 10 of each list</h3>
+            <canvas id="c4"></canvas>
+          </div>
         </div>
+      </section>
 
-        <!-- TAB 4: ADVANCED PRESSURE ANALYTICS -->
-        <div id="tab-content-analytics" class="space-y-8 hidden">
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <!-- Chart 1 -->
-                <div class="bg-slate-900/90 border border-slate-800 rounded-3xl p-6 shadow-xl">
-                    <div class="flex justify-between items-center mb-4">
-                        <h3 class="text-base font-bold text-white flex items-center gap-2">
-                            <i class="fa-solid fa-chart-column text-rr-gold"></i> Top Batters: Pressure Strike Rate vs Score
-                        </h3>
-                        <span class="text-xs text-slate-400 bg-slate-800 px-3 py-1 rounded-full">Bar Comparison</span>
-                    </div>
-                    <div class="h-80 w-full relative">
-                        <canvas id="batterChart"></canvas>
-                    </div>
-                </div>
+      <section id="bt">
+        <h2>Top 10 Batters Under Pressure</h2>
+        <p class="sub">
+          Click a column to sort. Expected SR = what an average batter scored on the same balls in
+          the same context.
+        </p>
+        <div class="bar"><input class="q" data-t="bat" placeholder="Search batter…" /></div>
+        <div class="card t"><table id="tb-bat"></table></div>
+      </section>
+      <section id="bw">
+        <h2>Top 10 Bowlers Under Pressure</h2>
+        <p class="sub">Efficiency = runs per over saved against the context-expected economy.</p>
+        <div class="bar"><input class="q" data-t="bowl" placeholder="Search bowler…" /></div>
+        <div class="card t"><table id="tb-bowl"></table></div>
+      </section>
 
-                <!-- Chart 2 -->
-                <div class="bg-slate-900/90 border border-slate-800 rounded-3xl p-6 shadow-xl">
-                    <div class="flex justify-between items-center mb-4">
-                        <h3 class="text-base font-bold text-white flex items-center gap-2">
-                            <i class="fa-solid fa-chart-line text-blue-400"></i> Top Bowlers: Pressure Economy vs Wickets
-                        </h3>
-                        <span class="text-xs text-slate-400 bg-slate-800 px-3 py-1 rounded-full">Performance Metric</span>
-                    </div>
-                    <div class="h-80 w-full relative">
-                        <canvas id="bowlerChart"></canvas>
-                    </div>
-                </div>
-            </div>
+      <section id="me">
+        <h2>Methodology &amp; Architecture</h2>
+        <p class="sub">Tap a step to expand.</p>
+        <div class="grid g2">
+          <div class="card step on">
+            <h3>1 · Win-probability model</h3>
+            <p>
+              One gradient-boosted classifier per innings (balls left, wickets, runs, required rate,
+              target, format), fitted out-of-fold by match. Chase AUC 0.87; first innings 0.67.
+            </p>
+          </div>
+          <div class="card step">
+            <h3>2 · Pressure = leverage</h3>
+            <p>
+              Leverage is the expected swing in win probability on a ball across all outcomes. The
+              top 20% of balls in each innings (while the match is still live) are high pressure;
+              the bottom 60% are ordinary. This captures required rate, wickets in hand, balls left
+              and closeness together, instead of fixed cut-offs.
+            </p>
+          </div>
+          <div class="card step">
+            <h3>3 · Value over context</h3>
+            <p>
+              Every ball is scored against the average player in the same innings, over,
+              wickets-lost bucket and format, with a wicket worth 10 runs. Batting and bowling use
+              the same logic.
+            </p>
+          </div>
+          <div class="card step">
+            <h3>4 · Fairness &amp; sample size</h3>
+            <p>
+              At least 90 pressure balls and 12 pressure matches; empirical-Bayes shrinkage so a few
+              lucky balls cannot create a top-10 place; IPL and T20I baselines kept separate.
+            </p>
+          </div>
+          <div class="card step">
+            <h3>5 · Consensus ranking</h3>
+            <p>
+              Ratings are recomputed under 54 settings (threshold, wicket cost, weights,
+              chase-only). Players earn Borda points for each top-10 finish; the consensus score is
+              their average out of 10.
+            </p>
+          </div>
+          <div class="card step">
+            <h3>6 · Limits</h3>
+            <p>
+              Pressure skill is noisy (split-half r about 0.1), so order within the top 10 is less
+              certain than membership. No opposition or batting-role adjustment.
+            </p>
+          </div>
         </div>
+        <div class="card" style="margin-top: 14px">
+          <h3>Rating formula</h3>
+          <code
+            >Rating = 0.5·z(PressureValue_shrunk) + 0.2·z(WPA_shrunk) + 0.3·z(Consistency_shrunk)
+            Value/ball (bat) = (runs − expected) − 10·(dismissed − expected)</code
+          >
+        </div>
+        <div class="card" style="margin-top: 14px">
+          <h3>Pressure vs ordinary deliveries (validation)</h3>
+          <p class="note">
+            High-pressure balls are far more decisive and sit closer to a coin-flip.
+          </p>
+          <div class="t">
+            <table style="min-width: 420px">
+              <thead>
+                <tr>
+                  <th>Metric</th>
+                  <th>High pressure</th>
+                  <th>Moderate</th>
+                  <th>Ordinary</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Deliveries</td>
+                  <td>38,769</td>
+                  <td>39,208</td>
+                  <td>116,962</td>
+                </tr>
+                <tr>
+                  <td>Average leverage (win-prob. points per ball)</td>
+                  <td>5.5</td>
+                  <td>2.7</td>
+                  <td>1.0</td>
+                </tr>
+                <tr>
+                  <td>Distance of win probability from 50:50</td>
+                  <td>0.15</td>
+                  <td>0.18</td>
+                  <td>0.28</td>
+                </tr>
+                <tr>
+                  <td>Dot-ball %</td>
+                  <td>34.9</td>
+                  <td>34.6</td>
+                  <td>33.3</td>
+                </tr>
+                <tr>
+                  <td>Share of IPL deliveries</td>
+                  <td>50%</td>
+                  <td>47%</td>
+                  <td>47%</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="card" style="margin-top: 14px">
+          <h3>Reliability checks</h3>
+          <ul class="note">
+            <li>
+              Win-probability model is out-of-fold, grouped by match (chase AUC 0.87, Brier 0.151).
+            </li>
+            <li>
+              Eligibility: at least 90 pressure balls and 12 pressure matches (130 batters, 136
+              bowlers qualify).
+            </li>
+            <li>Rank stability: the final order is a Borda consensus over 54 model settings.</li>
+            <li>Kohli and Rizwan were statistically tied for 10th among batters.</li>
+          </ul>
+        </div>
+      </section>
 
+      <section id="ex">
+        <h2>Export &amp; Submission Hub</h2>
+        <p class="sub">Everything an evaluator needs.</p>
+        <div class="grid g2">
+          <div class="card">
+            <h3>Methodology report (PDF)</h3>
+            <p class="note">7 pages: definition, ratings, fairness, evidence and limitations.</p>
+            <a class="btn" id="dl" download="SupeRR_Selector_S2_Round1_Methodology_Report.pdf"
+              >Download PDF report</a
+            >
+            <p class="note" id="dn"></p>
+          </div>
+          <div class="card">
+            <h3>Share this dashboard</h3>
+            <p class="note" id="lk"></p>
+            <button class="btn o" id="cp">Copy link</button><span class="note" id="cm"></span>
+          </div>
+        </div>
+      </section>
     </main>
-
-    <!-- FOOTER -->
-    <footer class="bg-slate-950 border-t border-slate-800 text-slate-400 py-8 mt-16">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-4">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-xl bg-rr-gold text-rr-navy flex items-center justify-center font-extrabold text-lg">
-                    RR
-                </div>
-                <div>
-                    <div class="font-bold text-white">Rajasthan Royals Analytics</div>
-                    <div class="text-xs text-slate-400">SupeRR Selector Season 2 • Round 1 Submission</div>
-                </div>
-            </div>
-            <div class="text-xs text-slate-400 text-center md:text-right">
-                <p>Data-driven decision system built with historical IPL & T20I records (2022+).</p>
-                <p class="mt-1">All rights reserved © 2026 Rajasthan Royals.</p>
-            </div>
-        </div>
+    <footer>
+      SupeRR Selector Season 2 · all figures computed from the supplied ball-by-ball data
     </footer>
-
-    <!-- JAVASCRIPT LOGIC -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
     <script>
-        // Data Store
-        const battersData = [
-            { rank: 1, name: "Vaibhav Sooryavanshi", sr: 214.6, avg: 44.0, score: 100.6, role: "Elite Finisher" },
-            { rank: 2, name: "Naman Dhir", sr: 175.5, avg: 24.9, score: 86.7, role: "Clutch Power" },
-            { rank: 3, name: "Priyansh Arya", sr: 187.9, avg: 26.6, score: 85.6, role: "Explosive Opener" },
-            { rank: 4, name: "Mohammad Haris", sr: 160.6, avg: 21.4, score: 85.5, role: "Aggressive Anchor" },
-            { rank: 5, name: "Reeza Hendricks", sr: 157.5, avg: 37.6, score: 83.9, role: "Reliable Stayer" },
-            { rank: 6, name: "Suryakumar Yadav", sr: 168.9, avg: 36.2, score: 82.5, role: "Master Innovator" },
-            { rank: 7, name: "David Miller", sr: 149.1, avg: 34.7, score: 81.6, role: "Cool Head" },
-            { rank: 8, name: "Rishabh Pant", sr: 155.3, avg: 23.0, score: 80.1, role: "Game Changer" },
-            { rank: 9, name: "Ryan Rickelton", sr: 160.4, avg: 36.0, score: 79.2, role: "Consistent Scorer" },
-            { rank: 10, name: "Sai Sudharsan", sr: 154.0, avg: 37.1, score: 78.5, role: "Solid Builder" }
-        ];
-
-        const bowlersData = [
-            { rank: 1, name: "Sufiyan Muqeem", econ: 5.08, wickets: 33, score: 30.6, role: "Super Spinner" },
-            { rank: 2, name: "Shahnawaz Dhani", econ: 6.55, wickets: 9, score: 26.0, role: "Death Specialist" },
-            { rank: 3, name: "Abrar Ahmed", econ: 5.80, wickets: 38, score: 25.7, role: "Wicket Taker" },
-            { rank: 4, name: "Mark Wood", econ: 7.68, wickets: 24, score: 25.5, role: "Pace Enforcer" },
-            { rank: 5, name: "Matthew Humphreys", econ: 6.47, wickets: 17, score: 24.1, role: "Economical Spin" },
-            { rank: 6, name: "Jamie Overton", econ: 7.55, wickets: 33, score: 24.1, role: "Clutch Strike" },
-            { rank: 7, name: "Mohammad Nawaz", econ: 6.41, wickets: 47, score: 23.6, role: "Pressure Maestro" },
-            { rank: 8, name: "Imad Wasim", econ: 6.00, wickets: 10, score: 23.6, role: "Powerplay Shield" },
-            { rank: 9, name: "Corbin Bosch", econ: 7.93, wickets: 24, score: 23.4, role: "Medium Pacer" },
-            { rank: 10, name: "George Linde", econ: 7.12, wickets: 11, score: 23.2, role: "Tight Containment" }
-        ];
-
-        let batterSortAsc = true;
-        let bowlerSortAsc = true;
-        let batterChartInstance = null;
-        let bowlerChartInstance = null;
-
-        window.onload = function() {
-            renderBattersTable(battersData);
-            renderBowlersTable(bowlersData);
-            initCharts();
-        };
-
-        // Switch Main Tabs
-        function switchMainTab(tab) {
-            const tabs = ['overview', 'batters', 'bowlers', 'analytics'];
-            tabs.forEach(t => {
-                const content = document.getElementById(`tab-content-${t}`);
-                const navBtn = document.getElementById(`nav-${t}`);
-                if (t === tab) {
-                    content.classList.remove('hidden');
-                    navBtn.className = "px-4 py-2 rounded-xl text-sm font-bold transition-all bg-rr-gold text-rr-navy shadow-md whitespace-nowrap flex items-center gap-2";
-                } else {
-                    content.classList.add('hidden');
-                    navBtn.className = "px-4 py-2 rounded-xl text-sm font-semibold transition-all text-slate-300 hover:text-white hover:bg-slate-800 whitespace-nowrap flex items-center gap-2";
-                }
-            });
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        // Render Batters Table
-        function renderBattersTable(data) {
-            const tbody = document.getElementById('batters-table-tbody');
-            tbody.innerHTML = data.map(b => `
-                <tr class="hover:bg-slate-800/50 transition-all">
-                    <td class="py-4 px-6 font-bold text-rr-gold">#${b.rank}</td>
-                    <td class="py-4 px-6 font-semibold text-white flex items-center gap-2">
-                        <span>${b.name}</span>
-                        ${b.rank === 1 ? '<span class="px-2 py-0.5 bg-rr-gold/20 text-rr-gold text-[10px] rounded-full font-bold">Rank #1</span>' : ''}
-                    </td>
-                    <td class="py-4 px-6 text-slate-300 font-mono">${b.sr}</td>
-                    <td class="py-4 px-6 text-slate-300 font-mono">${b.avg}</td>
-                    <td class="py-4 px-6 text-rr-gold font-bold font-mono">${b.score}</td>
-                    <td class="py-4 px-6 text-center">
-                        <span class="px-3 py-1 rounded-full text-xs font-semibold bg-slate-800 text-slate-300 border border-slate-700">${b.role}</span>
-                    </td>
-                </tr>
-            `).join('');
-        }
-
-        // Render Bowlers Table
-        function renderBowlersTable(data) {
-            const tbody = document.getElementById('bowlers-table-tbody');
-            tbody.innerHTML = data.map(bo => `
-                <tr class="hover:bg-slate-800/50 transition-all">
-                    <td class="py-4 px-6 font-bold text-blue-400">#${bo.rank}</td>
-                    <td class="py-4 px-6 font-semibold text-white flex items-center gap-2">
-                        <span>${bo.name}</span>
-                        ${bo.rank === 1 ? '<span class="px-2 py-0.5 bg-blue-500/20 text-blue-400 text-[10px] rounded-full font-bold">Rank #1</span>' : ''}
-                    </td>
-                    <td class="py-4 px-6 text-slate-300 font-mono">${bo.econ}</td>
-                    <td class="py-4 px-6 text-slate-300 font-mono">${bo.wickets}</td>
-                    <td class="py-4 px-6 text-blue-400 font-bold font-mono">${bo.score}</td>
-                    <td class="py-4 px-6 text-center">
-                        <span class="px-3 py-1 rounded-full text-xs font-semibold bg-slate-800 text-slate-300 border border-slate-700">${bo.role}</span>
-                    </td>
-                </tr>
-            `).join('');
-        }
-
-        // Filter Tables
-        function filterBattersTable() {
-            const query = document.getElementById('batter-search').value.toLowerCase();
-            const filtered = battersData.filter(b => b.name.toLowerCase().includes(query));
-            renderBattersTable(filtered);
-        }
-
-        function filterBowlersTable() {
-            const query = document.getElementById('bowler-search').value.toLowerCase();
-            const filtered = bowlersData.filter(bo => bo.name.toLowerCase().includes(query));
-            renderBowlersTable(filtered);
-        }
-
-        // Sorting
-        function sortTable(type, column) {
-            if (type === 'batters') {
-                batterSortAsc = !batterSortAsc;
-                battersData.sort((a, b) => batterSortAsc ? a[column] - b[column] : b[column] - a[column]);
-                renderBattersTable(battersData);
-            } else {
-                bowlerSortAsc = !bowlerSortAsc;
-                bowlersData.sort((a, b) => bowlerSortAsc ? a[column] - b[column] : b[column] - a[column]);
-                renderBowlersTable(bowlersData);
-            }
-        }
-
-        // Initialize Charts
-        function initCharts() {
-            const ctxBatter = document.getElementById('batterChart').getContext('2d');
-            batterChartInstance = new Chart(ctxBatter, {
-                type: 'bar',
-                data: {
-                    labels: battersData.map(b => b.name),
-                    datasets: [
-                        { label: 'Pressure Strike Rate', data: battersData.map(b => b.sr), backgroundColor: '#D69E2E', borderRadius: 6 },
-                        { label: 'Pressure Score', data: battersData.map(b => b.score), backgroundColor: '#3182CE', borderRadius: 6 }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { labels: { color: '#E2E8F0', font: { family: 'Inter', size: 11 } } } },
-                    scales: {
-                        x: { ticks: { color: '#94A3B8', font: { size: 9 }, maxRotation: 30, minRotation: 30 }, grid: { color: 'rgba(255,255,255,0.05)' } },
-                        y: { ticks: { color: '#94A3B8' }, grid: { color: 'rgba(255,255,255,0.05)' } }
-                    }
-                }
-            });
-
-            const ctxBowler = document.getElementById('bowlerChart').getContext('2d');
-            bowlerChartInstance = new Chart(ctxBowler, {
-                type: 'bar',
-                data: {
-                    labels: bowlersData.map(bo => bo.name),
-                    datasets: [
-                        { label: 'Pressure Economy', data: bowlersData.map(bo => bo.econ), backgroundColor: '#3182CE', borderRadius: 6 },
-                        { label: 'Pressure Wickets', data: bowlersData.map(bo => bo.wickets), backgroundColor: '#D69E2E', borderRadius: 6 }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { labels: { color: '#E2E8F0', font: { family: 'Inter', size: 11 } } } },
-                    scales: {
-                        x: { ticks: { color: '#94A3B8', font: { size: 9 }, maxRotation: 30, minRotation: 30 }, grid: { color: 'rgba(255,255,255,0.05)' } },
-                        y: { ticks: { color: '#94A3B8' }, grid: { color: 'rgba(255,255,255,0.05)' } }
-                    }
-                }
-            });
-        }
-
-        // Actions
-        function downloadReport() {
-            showToast("Downloading Methodology Report PDF...");
-            setTimeout(() => {
-                showToast("Report PDF ready for submission!");
-            }, 1000);
-        }
-
-        function copyShareableLink() {
-            const dummy = window.location.href;
-            document.addEventListener('copy', function(e) {
-                e.clipboardData.setData('text/plain', dummy);
-                e.preventDefault();
-            }, false);
-            document.execCommand('copy');
-            showToast("Dashboard URL copied to clipboard!");
-        }
-
-        function showToast(message) {
-            const toast = document.getElementById('toast');
-            const toastMsg = document.getElementById('toast-message');
-            toastMsg.innerText = message;
-            toast.classList.remove('translate-y-20', 'opacity-0');
-            setTimeout(() => {
-                toast.classList.add('translate-y-20', 'opacity-0');
-            }, 3000);
-        }
+      const D = {
+          bat: [
+            ["Nicholas Pooran", 349, 61, 171.9, 133.8, 60.0, 7.46, 100],
+            ["Heinrich Klaasen", 285, 49, 182.1, 140.3, 47.2, 6.63, 98],
+            ["Yashasvi Jaiswal", 433, 67, 165.4, 135.6, 42.1, 6.0, 67],
+            ["Shreyas Iyer", 330, 57, 177.6, 132.0, 36.6, 5.24, 80],
+            ["Cameron Green", 231, 43, 167.5, 134.6, 64.5, 4.78, 94],
+            ["Rovman Powell", 255, 55, 189.4, 136.2, 37.2, 3.72, 67],
+            ["Vaibhav Sooryavanshi", 160, 25, 213.1, 135.0, 42.6, 3.59, 75],
+            ["Suryakumar Yadav", 462, 88, 170.1, 130.8, 39.3, 3.56, 72],
+            ["Glenn Maxwell", 213, 39, 171.8, 133.9, 52.3, 3.31, 80],
+            ["Virat Kohli", 546, 73, 151.5, 141.2, 55.1, 1.98, 50],
+          ],
+          bowl: [
+            ["Josh Hazlewood", 332, 50, 7.23, 8.83, 32, 9.98, 100],
+            ["Kuldeep Yadav", 288, 65, 7.65, 8.4, 25, 5.76, 83],
+            ["Yuzvendra Chahal", 389, 75, 8.38, 8.91, 28, 5.13, 100],
+            ["Mark Adair", 204, 31, 6.82, 8.26, 16, 4.63, 89],
+            ["Jasprit Bumrah", 378, 59, 7.16, 8.84, 23, 4.5, 63],
+            ["Tim Southee", 154, 29, 6.43, 8.38, 11, 4.19, 89],
+            ["Mohammad Nawaz", 150, 34, 7.4, 7.77, 14, 4.17, 61],
+            ["Lockie Ferguson", 193, 37, 8.77, 9.17, 14, 4.13, 50],
+            ["Rashid Khan", 333, 77, 7.14, 8.66, 17, 2.89, 59],
+            ["Matheesha Pathirana", 187, 31, 9.05, 10.28, 18, 2.5, 67],
+          ],
+          lev: {
+            i1: [
+              3.35, 3.16, 2.96, 2.75, 2.56, 2.41, 2.13, 2.17, 2.05, 1.91, 1.78, 1.85, 1.91, 1.96,
+              1.83, 2.27, 2.3, 2.32, 2.36, 2.27,
+            ],
+            i2: [
+              3.03, 2.44, 2.25, 2.07, 1.97, 1.95, 1.75, 1.73, 1.72, 1.7, 1.77, 1.7, 1.72, 1.69,
+              1.75, 2.13, 2.38, 2.42, 3.02, 4.53,
+            ],
+          },
+        },
+        $ = (x) => document.querySelector(x);
+      function show(s) {
+        document.querySelectorAll("section").forEach((e) => e.classList.toggle("on", e.id == s));
+        document
+          .querySelectorAll("nav button")
+          .forEach((b) => b.classList.toggle("on", b.dataset.s == s));
+        if (s == "ov") cnt();
+        scrollTo({ top: 0 });
+      }
+      document.querySelectorAll("nav button").forEach(
+        (b) =>
+          (b.onclick = () => {
+            show(b.dataset.s);
+            try {
+              location.hash = b.dataset.s;
+            } catch (e) {}
+          }),
+      );
+      document
+        .querySelectorAll(".step")
+        .forEach((c) => (c.onclick = () => c.classList.toggle("on")));
+      function cnt() {
+        document.querySelectorAll("[data-n]").forEach((e) => {
+          const n = +e.dataset.n,
+            t0 = performance.now();
+          (function f(t) {
+            const p = Math.min(1, (t - t0) / 1200);
+            e.textContent = Math.round(n * (1 - Math.pow(1 - p, 3))).toLocaleString();
+            if (p < 1) requestAnimationFrame(f);
+          })(t0);
+        });
+      }
+      const H = {
+        bat: [
+          "Rank",
+          "Batter",
+          "Pressure balls",
+          "Matches",
+          "Pressure SR",
+          "Expected SR",
+          "Average",
+          "Consensus score",
+        ],
+        bowl: [
+          "Rank",
+          "Bowler",
+          "Pressure balls",
+          "Matches",
+          "Pressure econ",
+          "Expected econ",
+          "Wickets",
+          "Consensus score",
+        ],
+      };
+      const S = { bat: { c: null, d: 1 }, bowl: { c: null, d: 1 } };
+      function rows(k) {
+        const b = k == "bat";
+        let r = D[k].map((p, i) => ({ i: i + 1, p }));
+        const q = $('.q[data-t="' + k + '"]').value.toLowerCase();
+        r = r.filter((x) => x.p[0].toLowerCase().includes(q));
+        const c = S[k].c;
+        if (c !== null)
+          r.sort((a, z) => {
+            const u = c == 0 ? a.i : a.p[c - 1],
+              v = c == 0 ? z.i : z.p[c - 1];
+            return (typeof u == "string" ? u.localeCompare(v) : u - v) * S[k].d;
+          });
+        $("#tb-" + k).innerHTML =
+          "<thead><tr>" +
+          H[k].map((h, j) => '<th data-c="' + j + '">' + h + "</th>").join("") +
+          "</tr></thead><tbody>" +
+          r
+            .map((x) => {
+              const p = x.p;
+              return (
+                '<tr><td class="rk">' +
+                x.i +
+                '</td><td class="nm">' +
+                p[0] +
+                "</td><td>" +
+                p[1] +
+                "</td><td>" +
+                p[2] +
+                '</td><td class="gd">' +
+                p[3] +
+                "</td><td>" +
+                p[4] +
+                "</td><td>" +
+                p[5] +
+                '</td><td><span class="sc">' +
+                p[6].toFixed(2) +
+                "</span></td></tr>"
+              );
+            })
+            .join("") +
+          "</tbody>";
+        document.querySelectorAll("#tb-" + k + " th").forEach(
+          (h) =>
+            (h.onclick = () => {
+              const j = +h.dataset.c;
+              const m = j == 0 ? 0 : j;
+              S[k].d = S[k].c === m ? -S[k].d : 1;
+              S[k].c = m;
+              rows(k);
+            }),
+        );
+      }
+      ["bat", "bowl"].forEach((k) => {
+        $('.q[data-t="' + k + '"]').oninput = () => rows(k);
+        rows(k);
+      });
+      const op = {
+        responsive: true,
+        plugins: { legend: { labels: { color: "#93a0bd" } } },
+        scales: {
+          x: {
+            ticks: { color: "#93a0bd", maxRotation: 60, font: { size: 10 } },
+            grid: { color: "rgba(147,160,189,.1)" },
+          },
+          y: { ticks: { color: "#93a0bd" }, grid: { color: "rgba(147,160,189,.1)" } },
+        },
+      };
+      const sn = (n) => n.split(" ").slice(-1)[0],
+        PK = "#ed64a6",
+        AU = "#d69e2e",
+        BL = "#4a6fa5";
+      if (window.Chart) {
+        new Chart($("#c1"), {
+          type: "bar",
+          data: {
+            labels: D.bat.map((p) => sn(p[0])),
+            datasets: [
+              {
+                label: "Under pressure",
+                data: D.bat.map((p) => p[3]),
+                backgroundColor: PK,
+                borderRadius: 6,
+              },
+              {
+                label: "Expected",
+                data: D.bat.map((p) => p[4]),
+                backgroundColor: BL,
+                borderRadius: 6,
+              },
+            ],
+          },
+          options: op,
+        });
+        new Chart($("#c2"), {
+          type: "bar",
+          data: {
+            labels: D.bowl.map((p) => sn(p[0])),
+            datasets: [
+              {
+                label: "Under pressure",
+                data: D.bowl.map((p) => p[3]),
+                backgroundColor: PK,
+                borderRadius: 6,
+              },
+              {
+                label: "Expected",
+                data: D.bowl.map((p) => p[4]),
+                backgroundColor: BL,
+                borderRadius: 6,
+              },
+            ],
+          },
+          options: op,
+        });
+        new Chart($("#c3"), {
+          type: "line",
+          data: {
+            labels: D.lev.i1.map((_, i) => i + 1),
+            datasets: [
+              { label: "1st innings", data: D.lev.i1, borderColor: BL, tension: 0.35 },
+              { label: "Chase", data: D.lev.i2, borderColor: PK, tension: 0.35 },
+            ],
+          },
+          options: op,
+        });
+        new Chart($("#c4"), {
+          type: "bar",
+          data: {
+            labels: D.bat.map((p) => sn(p[0])).concat(D.bowl.map((p) => sn(p[0]))),
+            datasets: [
+              {
+                label: "Consensus score (0-10)",
+                data: D.bat.map((p) => p[6]).concat(D.bowl.map((p) => p[6])),
+                backgroundColor: D.bat.map(() => PK).concat(D.bowl.map(() => AU)),
+                borderRadius: 6,
+              },
+            ],
+          },
+          options: op,
+        });
+      }
+      $("#lk").textContent = location.href;
+      $("#cp").onclick = () => {
+        const t = location.href;
+        (navigator.clipboard ? navigator.clipboard.writeText(t) : Promise.reject()).then(
+          () => ($("#cm").textContent = " Copied!"),
+          () => ($("#cm").textContent = " Copy the link from the box above."),
+        );
+      };
+      $("#dl").href = "SupeRR_Selector_S2_Round1_Methodology_Report.pdf";
+      $("#dn").textContent = "Keep the PDF in the same folder as this HTML file.";
+      const h = (location.hash || "").slice(1);
+      if (["ov", "bt", "bw", "me", "ex"].includes(h)) show(h);
+      else cnt();
     </script>
-</body>
+  </body>
 </html>
