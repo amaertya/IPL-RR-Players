@@ -1,0 +1,46 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>SupeRR Selector S2 | Pressure Performance Dashboard</title>
+<style>
+:root{--bg:#f5f6fb;--card:#fff;--tx:#0b1f4b;--mu:#5b6478;--pk:#ea1a85;--ln:#e1e5f0;--nv:#0b1f4b;--gr:#9aa3b5;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0b0f19;--card:#141a2b;--tx:#eef1fa;--mu:#9aa3b5;--ln:#26304a;--nv:#7f93d6;--gr:#5b6478;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0b0f19;--card:#141a2b;--tx:#eef1fa;--mu:#9aa3b5;--ln:#26304a;--nv:#7f93d6;--gr:#5b6478;color-scheme:dark}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--tx);font:14px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}
+header{background:linear-gradient(120deg,#ea1a85,#5b1a7a 60%,#0b1f4b);color:#fff;padding:28px 20px}
+.w{max-width:1100px;margin:0 auto;padding:0 16px}header .w{padding:0}
+h1{margin:6px 0 4px;font-size:clamp(22px,4vw,34px)}.tag{font-size:11px;letter-spacing:.12em;text-transform:uppercase;opacity:.85}
+.k{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin:18px 0}
+.c{background:var(--card);border:1px solid var(--ln);border-radius:14px;padding:16px}.k b{font-size:26px;display:block}.k span{color:var(--mu);font-size:12px}
+h2{font-size:17px;margin:26px 0 10px}.g3{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px}.c p{margin:4px 0;color:var(--mu)}.c h3{margin:0 0 4px;font-size:14px;color:var(--pk)}
+.bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px}
+button,input{font:inherit;border-radius:10px;border:1px solid var(--ln);padding:8px 14px;background:var(--card);color:var(--tx)}
+button.on{background:var(--pk);border-color:var(--pk);color:#fff;font-weight:600;cursor:pointer}button{cursor:pointer}input{flex:1;min-width:180px}
+.t{overflow-x:auto}table{width:100%;border-collapse:collapse;min-width:680px}th{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--mu);text-align:left;padding:8px;border-bottom:1px solid var(--ln)}
+td{padding:9px 8px;border-bottom:1px solid var(--ln);vertical-align:middle}.rk{font-weight:800;color:var(--pk);width:34px}.nm{font-weight:600}
+.dl{color:#12a150;font-weight:700}.mb{position:relative;height:8px;background:var(--ln);border-radius:4px;min-width:110px}.mb i{position:absolute;top:0;left:0;height:8px;border-radius:4px}
+.lg{font-size:12px;color:var(--mu);margin-top:8px}.lg u{display:inline-block;width:10px;height:10px;border-radius:3px;margin:0 4px 0 10px;vertical-align:middle;text-decoration:none}
+.th{margin-left:auto}ul{margin:6px 0;padding-left:18px;color:var(--mu)}footer{text-align:center;color:var(--mu);font-size:12px;padding:26px 16px}
+</style></head><body>
+<header><div class="w"><div class="tag">Rajasthan Royals | SupeRR Selector Season 2 | Round 1</div><h1>Who Delivers When It Matters?</h1><div>Win-probability leverage model of pressure, IPL + T20I 2022–2026</div></div></header>
+<main class="w">
+<div class="k"><div class="c"><b>194,939</b><span>deliveries modelled (818 completed matches)</span></div><div class="c"><b>38,769</b><span>high-pressure deliveries (top 20% leverage per innings)</span></div><div class="c"><b>5.5×</b><span>more decisive than ordinary deliveries</span></div><div class="c"><b>54</b><span>model specifications in the consensus ranking</span></div></div>
+<h2>How pressure is defined</h2>
+<div class="g3"><div class="c"><h3>1. Win-probability model</h3><p>Gradient-boosted model per innings using balls left, wickets, runs, required rate, target and format. Out-of-fold. Chase AUC 0.87.</p></div>
+<div class="c"><h3>2. Leverage = pressure</h3><p>Expected swing in win probability on each ball across all outcomes. Top 20% of an innings = high pressure; bottom 60% = ordinary.</p></div>
+<div class="c"><h3>3. Value over context</h3><p>Each delivery vs an average player in the same innings, over, wickets and format; a wicket is worth 10 runs. Compared with the player’s own ordinary level, shrunk for sample size.</p></div></div>
+<h2>Final top 10 under pressure</h2>
+<div class="bar"><button id="bb" class="on">Batters</button><button id="bw">Bowlers</button><input id="q" placeholder="Search player…" aria-label="Search player"></div>
+<div class="c t"><table><thead id="h"></thead><tbody id="r"></tbody></table><div class="lg" id="lg"></div></div>
+<h2>Reliability and limitations</h2>
+<div class="c"><ul><li>Per-ball outcomes are noisy (split-half r ≈ 0.1), so ratings are shrunk and the order within the top 10 is less certain than membership.</li><li>“Top-10 %” is how often a player stays in the top 10 across 54 settings (pressure threshold, wicket cost, weights, all-innings vs chase-only).</li><li>First-innings win probability is weaker (AUC 0.67); no opposition or role adjustment. Kohli and Rizwan were essentially tied for 10th.</li></ul></div>
+</main><footer>Built for SupeRR Selector Season 2 | all figures computed from the supplied ball-by-ball data</footer>
+<script>
+const D={"bat": [{"n": "Nicholas Pooran", "b": 349, "m": 61, "a": 171.9, "e": 133.8, "o": 158.3, "x": 10, "t": 100}, {"n": "Heinrich Klaasen", "b": 285, "m": 49, "a": 182.1, "e": 140.3, "o": 161.9, "x": 11, "t": 98}, {"n": "Yashasvi Jaiswal", "b": 433, "m": 67, "a": 165.4, "e": 135.6, "o": 147.4, "x": 17, "t": 67}, {"n": "Shreyas Iyer", "b": 330, "m": 57, "a": 177.6, "e": 132.0, "o": 150.9, "x": 16, "t": 80}, {"n": "Cameron Green", "b": 231, "m": 43, "a": 167.5, "e": 134.6, "o": 143.5, "x": 6, "t": 94}, {"n": "Rovman Powell", "b": 255, "m": 55, "a": 189.4, "e": 136.2, "o": 137.7, "x": 13, "t": 67}, {"n": "Vaibhav Sooryavanshi", "b": 160, "m": 25, "a": 213.1, "e": 135.0, "o": 219.3, "x": 8, "t": 75}, {"n": "Suryakumar Yadav", "b": 462, "m": 88, "a": 170.1, "e": 130.8, "o": 170.1, "x": 20, "t": 72}, {"n": "Glenn Maxwell", "b": 213, "m": 39, "a": 171.8, "e": 133.9, "o": 162.2, "x": 7, "t": 80}, {"n": "Virat Kohli", "b": 546, "m": 73, "a": 151.5, "e": 141.2, "o": 147.0, "x": 15, "t": 50}], "bowl": [{"n": "Josh Hazlewood", "b": 332, "m": 50, "a": 7.23, "e": 8.83, "o": 8.92, "x": 32, "t": 100}, {"n": "Kuldeep Yadav", "b": 288, "m": 65, "a": 7.65, "e": 8.4, "o": 8.2, "x": 25, "t": 83}, {"n": "Yuzvendra Chahal", "b": 389, "m": 75, "a": 8.38, "e": 8.91, "o": 8.75, "x": 28, "t": 100}, {"n": "Mark Adair", "b": 204, "m": 31, "a": 6.82, "e": 8.26, "o": 9.1, "x": 16, "t": 89}, {"n": "Jasprit Bumrah", "b": 378, "m": 59, "a": 7.16, "e": 8.84, "o": 7.19, "x": 23, "t": 63}, {"n": "Tim Southee", "b": 154, "m": 29, "a": 6.43, "e": 8.38, "o": 8.34, "x": 11, "t": 89}, {"n": "Mohammad Nawaz", "b": 150, "m": 34, "a": 7.4, "e": 7.77, "o": 7.12, "x": 14, "t": 61}, {"n": "Lockie Ferguson", "b": 193, "m": 37, "a": 8.77, "e": 9.17, "o": 8.92, "x": 14, "t": 50}, {"n": "Rashid Khan", "b": 333, "m": 77, "a": 7.14, "e": 8.66, "o": 7.52, "x": 17, "t": 59}, {"n": "Matheesha Pathirana", "b": 187, "m": 31, "a": 9.05, "e": 10.28, "o": 8.83, "x": 18, "t": 67}]};let m='bat';
+const H={bat:['#','Batter','Pressure balls','Matches','Pressure SR','Expected SR','Ordinary SR','Outs','Top-10 %'],bowl:['#','Bowler','Pressure balls','Matches','Pressure econ','Expected econ','Ordinary econ','Wkts','Top-10 %']};
+function draw(){const s=document.getElementById('q').value.toLowerCase(),b=m=='bat';
+document.getElementById('h').innerHTML='<tr>'+H[m].map(x=>'<th>'+x+'</th>').join('')+'<th>Vs expected</th></tr>';
+const mx=Math.max(...D[m].map(p=>Math.max(p.a,p.e,p.o)));
+document.getElementById('r').innerHTML=D[m].map((p,i)=>{if(!p.n.toLowerCase().includes(s))return'';const d=b?p.a-p.e:p.e-p.a;
+return'<tr><td class="rk">'+(i+1)+'</td><td class="nm">'+p.n+'</td><td>'+p.b+'</td><td>'+p.m+'</td><td><b>'+p.a+'</b></td><td>'+p.e+'</td><td>'+p.o+'</td><td>'+p.x+'</td><td>'+p.t+'%</td><td><div class="dl">'+(d>0?'+':'')+d.toFixed(b?1:2)+(b?' SR':' runs/over')+'</div><div class="mb"><i style="width:'+(p.e/mx*100)+'%;background:var(--gr);opacity:.5"></i><i style="width:'+(p.a/mx*100)+'%;background:var(--pk);height:4px;top:2px"></i></div></td></tr>'}).join('');
+document.getElementById('lg').innerHTML='<u style="background:var(--pk)"></u>Under pressure<u style="background:var(--gr)"></u>Context-expected (average player, same situations)'}
+function sw(x){m=x;bb.classList.toggle('on',x=='bat');bw.classList.toggle('on',x=='bowl');draw()}
+bb.onclick=()=>sw('bat');bw.onclick=()=>sw('bowl');q.oninput=draw;draw();
+</script></body></html>
